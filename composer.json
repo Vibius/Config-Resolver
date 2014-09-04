@@ -1,5 +1,5 @@
 {
-    "name": "vibius/configResolver",
+    "name": "vibius/config-resolver",
     "type": "library",
     "description": "ConfigResolver component of Vibius PHP Framework",
     "license": "MIT",
