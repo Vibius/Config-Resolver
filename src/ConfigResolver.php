@@ -1,7 +1,7 @@
 <?php
 
 namespace Vibius\ConfigResolver;
-use Exception;
+use Exception, FileSystem;
 
 class ConfigResolver{
 
@@ -19,7 +19,7 @@ class ConfigResolver{
         if( $configPath ){
             $this->configPath = $configPath;
         }
-        $this->path = vibius_BASEPATH.$this->configPath;
+        $this->path = $this->configPath;
     }    
 
     /**
@@ -31,11 +31,11 @@ class ConfigResolver{
         if( !empty($src) ){
             $config = $src.$name.'.php';
         }
-        if( !file_exists($config) || !is_readable($config)){
+        if( !FileSystem::has($config) || (FileSystem::getVisibility($config) !== 'public')){
             throw new Exception("Config file does not exist or is not readable ($config)");
         }
 
-        $this->configList[$name] = require $config;
+        $this->configList[$name] = require vibius_BASEPATH.$config;
     }
 
     public function getParameter($param, $config){
