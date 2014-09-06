@@ -15,8 +15,11 @@ class ConfigResolver{
      */
     public $configList = [];
 
-    function __construct(){
-        $this->path = BASEPATH.$this->configPath;
+    function __construct($configPath = false){
+        if( $configPath ){
+            $this->configPath = $configPath;
+        }
+        $this->path = vibius_BASEPATH.$this->configPath;
     }    
 
     /**
