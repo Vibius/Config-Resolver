@@ -2,8 +2,11 @@
 
 namespace Vibius\ConfigResolver;
 use Exception, FileSystem;
+use \Vibius\Container\Container as Container;
 
-class ConfigResolver{
+class ConfigResolver extends \Vibius\Container\Container{
+
+    use \Vibius\Container\Methods;
 
     /**
      * @var string Holds path to config folder.
@@ -20,13 +23,15 @@ class ConfigResolver{
             $this->configPath = $configPath;
         }
         $this->path = $this->configPath;
+
+        $this->container = Container::open('Config', true);
     }    
 
     /**
      * @param string $name Name of the config to be added.
      * @param string $src Path to the config.
      */
-    public function addConfig($name, $src = ''){
+    public function add($name, $src = ''){
         $config = $this->path.$name.'.php';
         if( !empty($src) ){
             $config = $src.$name.'.php';
@@ -36,18 +41,22 @@ class ConfigResolver{
         }
 
         $this->configList[$name] = require vibius_BASEPATH.$config;
+
+        $config = require vibius_BASEPATH.$config;
+        $c_{$name} = Container::open("Config.$name", true, true);
+        foreach ($config as $key => $value) {
+            $c_{$name}->add($key, $value);
+        }
+
+        $this->container->add("Config.$name" ,$c_{$name});
+
     }
 
-    public function getParameter($param, $config){
-        if( !isset($this->configList[$config]) ){
+    public function get($config){
+        if( !$this->container->exists("Config.$config") ){
             throw new Exception("Config does not exist in config list ($config)");
         }
-
-        if( !isset($this->configList[$config][$param]) ){
-            throw new Exception("Config parameter does not exist ($param)");
-        }
-
-        return $this->configList[$config][$param];
+        return $this->container->get("Config.$config");
 
     }
 
